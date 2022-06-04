@@ -1,7 +1,9 @@
 import flask
 from flask import Flask, abort, jsonify, make_response, request
+from Artist import Artist
 from Author import Author
 from Book import Book
+from CD import CD
 
 
 from DB.main import Database
@@ -86,3 +88,23 @@ class Bookshop:
         query = "SELECT isbn,title, 'price' || ':'|| MIN(price) FROM book"
         row = self.db.fetch(query)
         return row 
+
+    ############################## CD-DVD ##############################
+    def add_cd(self, cd):  # adicionar um livro a lista books
+        self.cd = cd
+        self.artist = cd.get_artist() 
+        artist_name = self.artist['name']
+        self.artist = Artist(artist_name,self.artist['isAuthor'])
+
+        isAuthor = bool(self.artist.getIsAuthor())
+        isAuthor = (bool(self.artist.getIsAuthor())) #MASSIVE ERROR
+        #author_id = self.artist['author_id'] if isAuthor else 0
+        author_id = 2
+
+        query2 = "insert into artist (name,isAuthor,author_id) values (?,?,?)"
+        cursor = self.db.insert(query2,(artist_name,isAuthor,author_id))
+        
+        
+        query ="insert into `cd-dvd` (title,genre,release_year,disc_number,duration,price,artist_id) values (?,?,?,?,?,?,?)"
+        data = (self.cd.title,self.cd.genre,self.cd.releaseYear,self.cd.discNumber,self.cd.duration,self.cd.price,cursor.lastrowid)
+        self.db.insert(query,data)

@@ -4,6 +4,7 @@ from Author import Author
 
 from Book import Book
 from Bookshop import Bookshop
+from CD import CD
 from DB.main import Database
 
 
@@ -15,6 +16,17 @@ class BookJSONEncoder(JSONEncoder):
                 'title': obj.title,
                 'author': obj.author,
                 'price': obj.price
+            }
+        elif isinstance(obj, CD):
+            return {
+                'title':obj.title,
+                'genre':obj.genre,
+                'artist':obj.artist,
+                'release_year':obj.releaseYear,
+                'disc_number':obj.discNumber,
+                'duration':obj.duration,
+                'price':obj.price
+
             }
         else:
             return super(BookJSONEncoder, self).default(obj)
@@ -94,6 +106,30 @@ def create_bookshop_service():
     def  getMinPrice():
         row = bookshop.lessCostBook()
         return jsonify({'book': row}), 201
+
+    
+    ############################## CD-DVD ##############################
+
+    @app.route('/cd', methods=['POST'])  # add book
+    def create_cd():
+        print('creating cd-dvd...')
+        if not request.json:
+            abort(400)
+
+        artist = request.json["artist"]
+
+        cd = CD(
+            request.json['title'],
+            request.json['genre'],
+            request.json['release_year'],
+            request.json['disc_number'],
+            request.json['duration'],
+            int(request.json['price']),
+            artist
+        )
+        
+        bookshop.add_cd(cd)
+        return jsonify({'cd': cd}), 201
 
     @app.errorhandler(400)
     def not_found(error):
