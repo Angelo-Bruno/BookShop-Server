@@ -58,8 +58,8 @@ def create_bookshop_service():
             request.json['title'],
             int(request.json['price']),
             author
-            
         )
+        
         bookshop.add_book(book)
         return jsonify({'book': book}), 201
 
@@ -85,9 +85,14 @@ def create_bookshop_service():
         row = bookshop.countBooks()
         return jsonify({'Total books': row}), 201
 
-    @app.route('/book/expensive', methods=['GET'])  # rota para atualizar um livro
+    @app.route('/book/maxcost', methods=['GET'])  # rota para atualizar um livro
     def  getMaxPrice():
         row = bookshop.expensiveBook()
+        return jsonify({'book': row}), 201
+
+    @app.route('/book/mincost', methods=['GET'])  # rota para atualizar um livro
+    def  getMinPrice():
+        row = bookshop.lessCostBook()
         return jsonify({'book': row}), 201
 
     @app.errorhandler(400)

@@ -19,10 +19,10 @@ class Bookshop:
         self.author = self.book.get_author()
         
 
-        query2 = "insert into author (first_name,middle_name,last_name) values (?,?,?)"
-        cursor = self.db.insert(query2,(self.author['first_name'],self.author['middle_name'],self.author['last_name']))
-        self.author = Author(cursor.lastrowid,self.author['first_name'],self.author['middle_name'],self.author['last_name'])
-        self.author.id = cursor.lastrowid
+        query2 = "insert into author (name) values (?)"
+        cursor = self.db.insert(query2,(self.author['name'],))
+        self.author = Author(cursor.lastrowid,self.author['name'])
+
 
         self.book = Book(book.isbn,book.title,book.price,cursor.lastrowid)
         query ="insert into book (isbn,title,price,author_id) values (?,?,?,?)"
@@ -58,7 +58,7 @@ class Bookshop:
     def getBookAuthor(self,author_id):
         row = list()
         #query = f"select * from book where author_id = (select id from author where id = {isbn})"
-        query_name = self.db.fetchOne(f"SELECT first_name || ' '|| middle_name || ' '|| last_name FROM author WHERE id = ? ",author_id)
+        query_name = self.db.fetchOne(f"SELECT `name` FROM author WHERE id = ? ",author_id)
         if not query_name:
             abort(404,{"error":"author not found"})
         row.append({"author_name":query_name})
@@ -79,5 +79,10 @@ class Bookshop:
 
     def expensiveBook(self):
         query = "SELECT isbn,title, 'price' || ':'|| MAX(price) FROM book"
+        row = self.db.fetch(query)
+        return row 
+
+    def lessCostBook(self):
+        query = "SELECT isbn,title, 'price' || ':'|| MIN(price) FROM book"
         row = self.db.fetch(query)
         return row 
