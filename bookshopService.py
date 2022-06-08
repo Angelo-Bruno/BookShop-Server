@@ -131,6 +131,12 @@ def create_bookshop_service():
         bookshop.add_cd(cd)
         return jsonify({'cd': cd}), 201
 
+
+    @app.route('/cd/author/<int:isbn>', methods=['GET'])  # route to get artist cd and books
+    def getAuthorCD(isbn):
+        author = bookshop.getCdBooks(isbn)
+        return jsonify({'author': author}), 201
+
     @app.errorhandler(400)
     def not_found(error):
         return make_response(jsonify({'book': 'Not found'}), 400)
